@@ -8,11 +8,13 @@ export function simpleSort(arr: number[], order : "asc" | "desc" = "asc"): numbe
     for (let i = 0; i < n - 1; i++) {
         for (let j = 0; j < n - 1 - i; j++) {
             if (
-                typeof temp[j] === "number" &&
-                typeof temp[j + 1] === "number" &&
+                temp[j] !== undefined &&
+                temp[j + 1] !== undefined &&
                 compare(temp[j] as number, temp[j + 1] as number, order)
             ) {
-                [temp[j]!, temp[j + 1]!] = [temp[j + 1]!, temp[j]!];
+                let swap = temp[j] as number;
+                temp[j] = temp[j + 1] as number;
+                temp[j + 1] = swap;
             }
         }
     }
