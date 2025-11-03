@@ -1,23 +1,44 @@
-function compare(a: number, b: number, order: "asc" | "desc"): boolean {
-    return order === "asc" ? a > b : a < b;
+type SortOrder = 'asc' | 'desc';
+type CompareFn<T> = (a: T, b: T) => number;
+
+function createCompareFunction<T>(order: SortOrder): CompareFn<T> {
+  if (order === 'desc') {
+    return function(a: T, b: T): number {
+      if (a < b) return 1;
+      if (a > b) return -1;
+      return 0;
+    };
+  } else {
+    return function(a: T, b: T): number {
+      if (a > b) return 1;
+      if (a < b) return -1;
+      return 0;
+    };
+  }
 }
 
-export function simpleSort(arr: number[], order : "asc" | "desc" = "asc"): number[] {
-    const temp = [...arr];
-    let n = temp.length;
-    for (let i = 0; i < n - 1; i++) {
-        for (let j = 0; j < n - 1 - i; j++) {
-            if (
-                temp[j] !== undefined &&
-                temp[j + 1] !== undefined &&
-                compare(temp[j] as number, temp[j + 1] as number, order)
-            ) {
-                let swap = temp[j] as number;
-                temp[j] = temp[j + 1] as number;
-                temp[j + 1] = swap;
-            }
-        }
-    }
-    return temp;
+export function simpleSort<T>(arr: T[], ord: SortOrder = 'asc'): T[] {  
+  if (arr.length <= 1) {
+    return [...arr];
+  }
 
+  const result = [...arr];
+  const compare = createCompareFunction<T>(ord);
+  const n = result.length;
+
+  for (let i = 0; i < n - 1; i++) {
+    let swapped = false;
+    for (let j = 0; j < n - i - 1; j++) {
+      if (compare(result[j] as T, result[j + 1] as T) > 0) {
+        const temp = result[j];
+        result[j] = result[j + 1] as T;
+        result[j + 1] = temp as T;
+        swapped = true;
+      }
+    }
+    if (!swapped) {
+      break; // 최적화: 교체가 없으면 이미 정렬된 상태
+    }
+  }
+  return result;
 }
